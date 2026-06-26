@@ -145,6 +145,11 @@ See [`docs/IMPORT_EXPORT.md`](docs/IMPORT_EXPORT.md) for details.
 
 ## Quality checks
 
+On Windows:
+
+```cmd
+scripts\run-quality-checks.bat
+
 Run the local quality gate before opening a pull request:
 
 ```bash
