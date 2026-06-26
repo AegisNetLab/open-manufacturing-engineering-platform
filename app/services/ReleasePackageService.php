@@ -43,7 +43,7 @@ final class ReleasePackageService
         $files = count($collectedFiles);
         $bytes = array_sum(array_map(static fn (SplFileInfo $file): int => $file->getSize(), $collectedFiles));
 
-        if (class_exists('ZipArchive')) {
+        if (class_exists(\ZipArchive::class)) {
             $this->writeWithZipArchive($archivePath, $projectRoot, $collectedFiles);
         } else {
             $this->writeWithCliZip($archivePath, $projectRoot, $collectedFiles);
@@ -81,7 +81,11 @@ final class ReleasePackageService
     /** @param list<SplFileInfo> $files */
     private function writeWithCliZip(string $archivePath, string $projectRoot, array $files): void
     {
-        $zipBinary = trim((string) shell_exec('command -v zip 2>/dev/null'));
+        $command = PHP_OS_FAMILY === 'Windows'
+            ? 'where zip 2>NUL'
+            : 'command -v zip 2>/dev/null';
+
+        $zipBinary = trim((string) shell_exec($command));
         if ($zipBinary === '') {
             throw new RuntimeException('Neither PHP ZipArchive nor the zip command is available.');
         }
