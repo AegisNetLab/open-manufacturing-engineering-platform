@@ -1,0 +1,38 @@
+name: Quality Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  php-and-js-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql, json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: PHP syntax check
+        run: find . -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: JavaScript syntax check
+        run: node scripts/check-js-syntax.mjs
+
+      - name: Smoke check
+        run: php tests/smoke_check.php
+
+      - name: Unit tests
+        run: php tests/run.php
